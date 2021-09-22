@@ -13,13 +13,13 @@ from datetime import datetime
 class OfferData:
     def __init__(self):
         self.id = ''
-        self.available = ''
-        self.url = ''
+        self.available = 'true'
+        self.url = 'https://www.polyanka.pl'
         self.price = ''
-        self.currencyId = ''
+        self.currencyId = 'RUB'
         self.categoryId = ''
         self.pictures = []
-        self.delivery = ''
+        self.delivery = 'true'
         self.dimensions = ''
         self.weight = ''
         self.vendor = ''
@@ -58,21 +58,23 @@ def WriteFile():
         category = ET.SubElement(categories, 'category')
         category.set('id', cat[0])
         category.text = cat[1]
+    offers = ET.SubElement(shop, 'offers')
+
 
     mydata = minidom.parseString(ET.tostring(data)).toprettyxml(indent = '    ')
     with open ('test.xml', 'w', encoding='utf-8') as test:
         test.write(mydata)
 
 
-def ReadFromFiles(offers_xml, import_xml):
+def ReadFromFiles(OFFERS_XML, IMPORT_XML):
 
     offerslist = []
     categories_list = []
 
-    offers_et = ET.parse(offers_xml)
+    offers_et = ET.parse(OFFERS_XML)
     offers_root = offers_et.getroot()
 
-    import_et = ET.parse(import_xml)
+    import_et = ET.parse(IMPORT_XML)
     import_root = import_et.getroot()
 
     def FindCategories(grougs):
@@ -86,7 +88,19 @@ def ReadFromFiles(offers_xml, import_xml):
     FindCategories(import_root[0][3])
     catalog_data.categories = categories_list
 
+    def CheckOfferpic(product):
+        if product.findall('{urn:1C.ru:commerceml_2}Картинка') == []:
+            return False
+        else:
+            return True
+
+    products = import_root[1][4]
+    for product in products:
+
+
+
 catalog_data = CatalogData()
 
 ReadFromFiles('webdata/offers0_1.xml','webdata/import0_1.xml')
 WriteFile()
+
