@@ -1,10 +1,10 @@
 import xml.etree.cElementTree as ET
+import re
 
 from classes import *
 
 def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
 
-    offerslist = []
     categories_list = []
 
     offers_et = ET.parse(OFFERS_XML)
@@ -30,6 +30,30 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
         else:
             return True
 
-    # products = import_root[1][4]
-    # for product in products:
+    def size_finder(product_name):
+        size_data = re.search(product_name, r'Р(\w[\w]*)(-|/)?(\w[\w]*)?\)')
+
+        match size_data.groups(1):
+            case None:
+                return size_data.groups(0)
+            case '/':
+                return [size_data.groups(0), size_data.groups(2)]
+            case '-':
+                return None
+
+    products = import_root[1][4]
+    product_set = {}
+    for product in products:
+        if CheckOfferpic(product):
+            productId = product[0].text
+            product_set[productId] = OfferData()
+            product_set[productId].id = productId
+            product_set[productId].vendorCode = product[1].text
+            product_set[productId].name = product[2].text
+            product_set[productId].categoryId = product[2][4].text
+
+
+
+
+
 

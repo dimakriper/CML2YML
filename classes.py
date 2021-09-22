@@ -5,7 +5,8 @@ class OfferData:
         self.id = ''
         self.available = 'true'
         self.url = 'https://www.polyanka.pl'
-        self.price = ''
+        self.current_price = ''
+        self.prices = {}
         self.currencyId = 'RUB'
         self.categoryId = ''
         self.pictures = []
@@ -16,6 +17,11 @@ class OfferData:
         self.vendorCode = ''
         self.name = ''
         self.description = ''
+        self.quantity = ''
+        self.size = ''
+
+    def set_price(self, priceId):
+        self.current_price = self.prices[priceId]
 
 
 class CatalogData:
