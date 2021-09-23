@@ -13,19 +13,26 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     import_et = ET.parse(IMPORT_XML)
     import_root = import_et.getroot()
 
-    def FindCategories(grougs):
+    def find_categories(grougs):
         categories_list.append([grougs[0][0].text , grougs[0][1].text])
         try:
             groups = grougs[0][2]
-            FindCategories(groups)
+            find_categories(groups)
         except:
             pass
 
-    FindCategories(import_root[0][3])
+    find_categories(import_root[0][3])
     catalog_data.categories = categories_list
 
-    def CheckOfferpic(product):
+
+    def check_offerpic(product):
         if product.findall('{urn:1C.ru:commerceml_2}Картинка') == []:
+            return False
+        else:
+            return True
+
+    def check_description(product):
+        if product[5].text[-3:] == 'DEL':
             return False
         else:
             return True
@@ -44,13 +51,23 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     products = import_root[1][4]
     product_set = {}
     for product in products:
-        if CheckOfferpic(product):
-            productId = product[0].text
-            product_set[productId] = OfferData()
-            product_set[productId].id = productId
-            product_set[productId].vendorCode = product[1].text
-            product_set[productId].name = product[2].text
-            product_set[productId].categoryId = product[2][4].text
+        if check_offerpic(product) and check_description(product):
+            offerId = product[0].text
+            product_set[offerId] = OfferData()
+            product_set[offerId].offerId = offerId
+            product_set[offerId].vendorCode = product[1].text
+            product_set[offerId].name = product[2].text
+            product_set[offerId].categoryId = product[4][0].text
+            product_set[offerId].description = product[5].text
+            pictures = product.findall('{urn:1C.ru:commerceml_2}Картинка')
+            for picture in pictures:
+                product_set[offerId].pictures.append(picture.text)
+            product_id = product.find('{urn:1C.ru:commerceml_2}ЗначенияРеквизитов')[0][1].text[2:]
+            product_set[offerId].id = product_id
+            for category in catalog_data.categories:
+                if category[0] == product_set[offerId].categoryId:
+                    product_set[offerId].vendor = category[1]
+                    break
 
 
 
