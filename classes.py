@@ -20,16 +20,17 @@ class OfferData:
         self.name = ''                          #import
         self.description = ''                   #import
         self.quantity = ''                          #offers
-        self.size = ''                          #import
+        self.size = None                              #offers
+        self.sizes_available= ''                   #offers
 
     def set_price(self, priceId):
         self.current_price = self.prices[priceId]
 
-    def simplify_description(self, sizes):
+    def simplify_description(self):
         simpl_des = self.description
-        if re.search(simpl_des, r'Производство:.*') is not None:
+        if re.search(r'Производство:.*', simpl_des) is not None:
             simpl_des = re.sub(r'Производство:.*', '', simpl_des)
-        simpl_des = simpl_des + 'Размеры в наличии: ' + ''.join(sizes)
+        simpl_des = simpl_des + 'Размеры в наличии: ' + ''.join(self.sizes_available)
         return simpl_des
 
 
