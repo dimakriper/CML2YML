@@ -13,8 +13,9 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     import_root = import_et.getroot()
 
     def find_categories(groups):
-        catalog_data
-        catalog_data.categories.append(groups[0][0].text , groups[0][1].text)
+        category_data = groups[0][0].text , groups[0][1].text
+        if category_data not in catalog_data.categories:
+            catalog_data.categories.append(category_data)
         try:
             groups = groups[0][2]
             find_categories(groups)
@@ -50,13 +51,25 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     def quantity_is_positive(product_obj):
         return True if product_obj.quantity != '0' else False
 
-    # def
-
     def set_sizes_available(product_obj_set):
         dict_of_available = {}
-        for product_obj in product_obj_set:
-            if quantity_is_positive(product_obj):
-
+        list_of_sizes = []
+        current_id = None
+        for product_obj in product_obj_set.values():
+            if product_obj.size is not None:
+                if quantity_is_positive(product_obj):
+                    if current_id is None and product_obj.id is not None:
+                        current_id = product_obj.id
+                        list_of_sizes.append(product_obj.size)
+                    elif product_obj.id == current_id and product_obj.id is not None:
+                        list_of_sizes.append(product_obj.size)
+                    elif product_obj.id != current_id and product_obj.id is not None:
+                        dict_of_available[current_id] = list_of_sizes
+                        current_id = product_obj.id
+                        list_of_sizes = [product_obj.size]
+        for product_obj in product_obj_set.values():
+            if product_obj.id in dict_of_available:
+                product_obj.sizes_available = dict_of_available[product_obj.id]
 
     products = import_root[1][4]
     product_set = {}
@@ -95,6 +108,9 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
             product_set[offerId + '_add_size'].size = size_data[1]
         else:
             product_set[offerId].size = size_data
+
+    set_sizes_available(product_set)
+    return product_set
 
 
 

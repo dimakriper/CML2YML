@@ -21,17 +21,18 @@ class OfferData:
         self.description = ''                   #import
         self.quantity = ''                          #offers
         self.size = None                              #offers
-        self.sizes_available= ''                   #offers
+        self.sizes_available = []                   #set_sizes_available
 
     def set_price(self, priceId):
         self.current_price = self.prices[priceId]
 
     def simplify_description(self):
-        simpl_des = self.description
-        if re.search(r'Производство:.*', simpl_des) is not None:
-            simpl_des = re.sub(r'Производство:.*', '', simpl_des)
-        simpl_des = simpl_des + 'Размеры в наличии: ' + ''.join(self.sizes_available)
-        return simpl_des
+        simple_des = self.description
+        if re.search(r'Производство:.*', simple_des) is not None:
+            simple_des = re.sub(r'Производство:.*', '', simple_des)
+        if len(self.sizes_available) > 0:
+            simple_des = simple_des + 'Размеры в наличии: ' + ''.join(self.sizes_available)
+        return simple_des
 
 
 class CatalogData:
