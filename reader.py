@@ -1,8 +1,9 @@
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 import re
 import copy
 
 from classes import *
+
 
 def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
 
