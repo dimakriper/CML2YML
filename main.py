@@ -1,3 +1,4 @@
+import writer
 from classes import *
 import copy
 # from writer import *
@@ -16,12 +17,12 @@ import copy
 
 
 
-catalog_data = CatalogData()
-catalog_data.name = '0'
-catalog_data1 = catalog_data
-catalog_data1.name = '1'
-print(catalog_data.name, catalog_data1.name)
+# catalog_data = CatalogData()
+# catalog_data.name = '0'
+# catalog_data1 = catalog_data
+# catalog_data1.name = '1'
+# print(catalog_data.name, catalog_data1.name)
 
 # ReadFromFiles('webdata/offers0_1.xml','webdata/import0_1.xml', catalog_data)
-# WriteFile(catalog_data)
+writer.create_yml(CatalogData)
 
