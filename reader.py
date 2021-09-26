@@ -1,11 +1,12 @@
 import xml.etree.ElementTree as ET
-import re
 import copy
+import re
 
 from classes import *
 
 
-def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
+
+def parse_pairs(OFFERS_XML, IMPORT_XML, catalog_data):
 
     offers_et = ET.parse(OFFERS_XML)
     offers_root = offers_et.getroot()
@@ -14,7 +15,7 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     import_root = import_et.getroot()
 
     def find_categories(groups):
-        category_data = groups[0][0].text , groups[0][1].text
+        category_data = groups[0][0].text, groups[0][1].text
         if category_data not in catalog_data.categories:
             catalog_data.categories.append(category_data)
         try:
@@ -22,7 +23,7 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
             find_categories(groups)
         except:
             pass
-        return
+
 
     find_categories(import_root[0][3])
 
@@ -39,15 +40,17 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
             return True
 
     def size_finder(product_name):
-        size_data = re.search(r'P(\w[\w]*)(-|/)?(\w[\w]*)?\)', product_name)
-
-        match size_data.groups(1):
-            case None:
-                return size_data.groups(0)
-            case '/':
-                return [size_data.groups(0), size_data.groups(2)]
-            case '-':
-                return None
+        size_data = re.search(r'Р(\w[\w]*)([-/])?(\w[\w]*)?\)', product_name)
+        mid_symbol = size_data.groups()[1]
+        first_size = size_data.groups()[0]
+        last_size = size_data.groups()[2]
+        print(mid_symbol, first_size, last_size)
+        if mid_symbol is None:
+            return first_size
+        elif mid_symbol == '/':
+            return [first_size, last_size]
+        elif mid_symbol == '-':
+            return None
 
     def quantity_is_positive(product_obj):
         return True if product_obj.quantity != '0' else False
@@ -81,7 +84,7 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
             product_set[offerId].offerId = offerId
             product_set[offerId].vendorCode = product[1].text
             name = product[2].text
-            name = re.sub(r' \(Р(\w[\w]*)(-|/)?(\w[\w]*)?\)', '', name)
+            name = re.sub(r' \(Р(\w[\w]*)([-/])?(\w[\w]*)?\)', '', name)
             product_set[offerId].name = name
             product_set[offerId].categoryId = product[4][0].text
             product_set[offerId].description = product[5].text
@@ -98,17 +101,19 @@ def ReadFromFiles(OFFERS_XML, IMPORT_XML, catalog_data):
     offers = offers_root[1][7]
     for offer in offers:
         offerId = offer[0].text
-        currencies = offer[4]
-        for currency in currencies:
-            product_set[offerId].prices[currency[1].text] = currency[2].text
-        product_set[offerId].quantity = offer[5].text
-        size_data = size_finder(offer[2].text)
-        if type(size_data) is list:
-            product_set[offerId+'_add_size'] = copy.deepcopy(product_set[offerId])
-            product_set[offerId].size = size_data[0]
-            product_set[offerId + '_add_size'].size = size_data[1]
-        else:
-            product_set[offerId].size = size_data
+        if offerId in product_set:
+            currencies = offer[4]
+            for currency in currencies:
+                product_set[offerId].prices[currency[1].text] = currency[2].text
+            product_set[offerId].quantity = offer[5].text
+            size_data = size_finder(offer[2].text)
+            print(size_data)
+            if type(size_data) is list:
+                product_set[offerId+'_add_size'] = copy.deepcopy(product_set[offerId])
+                product_set[offerId].size = size_data[0]
+                product_set[offerId + '_add_size'].size = size_data[1]
+            else:
+                product_set[offerId].size = size_data
 
     set_sizes_available(product_set)
     return product_set
