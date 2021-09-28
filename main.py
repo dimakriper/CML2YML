@@ -25,5 +25,5 @@ catalog_data = CatalogData()
 # print(catalog_data.name, catalog_data1.name)
 
 # parse_pairs('webdata/offers0_1.xml','webdata/import0_1.xml', catalog_data)
-writer.create_yml(catalog_data, reader.parse_pairs('XML/webdata/offers0_1.xml','XML/webdata/import0_1.xml', catalog_data))
+writer.create_yml(catalog_data, reader.parse_pairs('XML/webdata/offers0_1.xml','XML/webdata/import0_1.xml', catalog_data), mode=1)
 

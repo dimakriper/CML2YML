@@ -86,15 +86,16 @@ def parse_pairs(OFFERS_XML, IMPORT_XML, catalog_data):
             name = product[2].text
             name = re.sub(r' \(Р(\w[\w]*)([-/])?(\w[\w]*)?\)', '', name)
             product_set[offerId].name = name
-            product_set[offerId].categoryId = product[4][0].text
+            product_set[offerId].categoryId = import_root[0][3][0][2][0][0].text
+            product_set[offerId].vendor_id = product[4][0].text
             product_set[offerId].description = product[5].text
             pictures = product.findall('{urn:1C.ru:commerceml_2}Картинка')
             for picture in pictures:
-                product_set[offerId].pictures.append(picture.text)
+                product_set[offerId].pictures.append('https://www.polyanka.pl/yml/webdata/' + picture.text)
             product_id = product.find('{urn:1C.ru:commerceml_2}ЗначенияРеквизитов')[0][1].text[2:]
             product_set[offerId].id = product_id
             for category in catalog_data.categories:
-                if category[0] == product_set[offerId].categoryId:
+                if category[0] == product_set[offerId].vendor_id:
                     product_set[offerId].vendor = category[1]
                     break
 

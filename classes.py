@@ -22,6 +22,7 @@ class OfferData:
         self.quantity = ''                          #offers
         self.size = None                              #offers
         self.sizes_available = []                   #set_sizes_available
+        self.vendor_id = ''
 
     def set_price(self, priceId):
         self.current_price = self.prices[priceId]
@@ -32,6 +33,8 @@ class OfferData:
             simple_des = re.sub(r'Производство:.*', '', simple_des)
         if len(self.sizes_available) > 0:
             simple_des = simple_des + 'Размеры в наличии: ' + ''.join(self.sizes_available)
+        else:
+            simple_des = simple_des + 'В наличии нет, возможен заказ товара.'
         return simple_des
 
 

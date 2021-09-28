@@ -4,7 +4,8 @@ from datetime import datetime
 
 from classes import *
 
-def create_yml(header, body):
+
+def create_yml(header, body, mode = 0):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d %H:%M")
 
@@ -26,8 +27,15 @@ def create_yml(header, body):
         category.set('id', cat[0])
         category.text = cat[1]
     offers = ET.SubElement(shop, 'offers')
-
-    offers_collection = body.values()
+    if mode == 0:
+        offers_collection = body.values()
+    else:
+        offers_collection = []
+        id_list = []
+        for item in body.values():
+            if item.id not in id_list:
+                offers_collection.append(item)
+                id_list.append(item.id)
     for item in offers_collection:
         # print(item.size, item.sizes_available)
         offer = ET.SubElement(offers, 'offer')
@@ -38,8 +46,9 @@ def create_yml(header, body):
         item.set_price('2613b2a7-c8df-11ea-9122-001c42b99c64') # test
         price = ET.SubElement(offer, 'price')
         price.text = item.current_price
-        # quantity = ET.SubElement(offer, 'quantity')
-        # quantity.text = item.quantity
+        if mode == 0:
+            quantity = ET.SubElement(offer, 'quantity')
+            quantity.text = item.quantity
         currencyId = ET.SubElement(offer, 'currencyId')
         currencyId.text = item.currencyId
         categoryId = ET.SubElement(offer, 'categoryId')
@@ -60,13 +69,20 @@ def create_yml(header, body):
         name = ET.SubElement(offer, 'name')
         name.text = item.name
         description = ET.SubElement(offer, 'description')
-        description.text = item.simplify_description()
-        # if item.size is not None:
-        #     param = ET.SubElement(offer, 'param')
-        #     param.set('name', 'Размер')
-        #     param.text = item.size
+        if mode == 0:
+            description.text = item.description
+            if item.size is not None:
+                param = ET.SubElement(offer, 'param')
+                param.set('name', 'Размер')
+                param.text = item.size
+        else:
+            description.text = item.simplify_description()
 
     mydata = minidom.parseString(ET.tostring(data)).toprettyxml(indent = '    ')
-    with open ('test_simplified.xml', 'w', encoding='utf-8') as test:
-        test.write(mydata)
+    if mode == 0:
+        with open ('test.xml', 'w', encoding='utf-8') as test:
+            test.write(mydata)
+    else:
+        with open ('test_simplified.xml', 'w', encoding='utf-8') as test:
+            test.write(mydata)
 
