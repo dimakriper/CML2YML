@@ -45,7 +45,7 @@ def collect_data(list_of_pairs, catalog_data):
             mid_symbol = size_data.groups()[1]
             first_size = size_data.groups()[0]
             last_size = size_data.groups()[2]
-            print(mid_symbol, first_size, last_size)
+            # print(mid_symbol, first_size, last_size)
             if mid_symbol is None:
                 return first_size
             elif mid_symbol == '/':
@@ -109,7 +109,7 @@ def collect_data(list_of_pairs, catalog_data):
                     product_set[offerId].prices[currency[1].text] = currency[2].text
                 product_set[offerId].quantity = offer[5].text
                 size_data = size_finder(offer[2].text)
-                print(size_data)
+                # print(size_data)
                 if type(size_data) is list:
                     product_set[offerId+'_add_size'] = copy.deepcopy(product_set[offerId])
                     product_set[offerId].size = size_data[0]
@@ -122,7 +122,7 @@ def collect_data(list_of_pairs, catalog_data):
         return product_set
 
     for pair in list_of_pairs:
-        data.append(parse_pairs(pair[1], pair[0]))
+        data.append(parse_pairs(pair[0], pair[1]))
 
     return data
 

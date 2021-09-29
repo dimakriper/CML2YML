@@ -32,7 +32,7 @@ class OfferData:
         if re.search(r'Производство:.*', simple_des) is not None:
             simple_des = re.sub(r'Производство:.*', '', simple_des)
         if len(self.sizes_available) > 0:
-            simple_des = simple_des + 'Размеры в наличии: ' + ''.join(self.sizes_available)
+            simple_des = simple_des + 'Размеры в наличии: ' + ', '.join(self.sizes_available)
         else:
             simple_des = simple_des + 'В наличии нет, возможен заказ товара.'
         return simple_des

@@ -5,7 +5,11 @@ from datetime import datetime
 from classes import *
 
 
-def create_yml(header, body, mode=0):
+def create_yml(header, body, scope):
+    yml_name = scope[0] + '.xml'
+    mode = scope[1]
+    price_code = scope[2]
+
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d %H:%M")
 
@@ -29,7 +33,7 @@ def create_yml(header, body, mode=0):
     offers = ET.SubElement(shop, 'offers')
 
     for data_dict in body:
-        if mode == 0:
+        if mode == 1:
             offers_collection = data_dict.values()
         else:
             offers_collection = []
@@ -39,52 +43,49 @@ def create_yml(header, body, mode=0):
                     offers_collection.append(item)
                     id_list.append(item.id)
         for item in offers_collection:
-            # print(item.size, item.sizes_available)
-            offer = ET.SubElement(offers, 'offer')
-            offer.set('id', item.id)
-            offer.set('available', item.available)
-            url = ET.SubElement(offer, 'url')
-            url.text = item.url
-            item.set_price('2613b2a7-c8df-11ea-9122-001c42b99c64') # test
-            price = ET.SubElement(offer, 'price')
-            price.text = item.current_price
-            if mode == 0:
-                quantity = ET.SubElement(offer, 'quantity')
-                quantity.text = item.quantity
-            currencyId = ET.SubElement(offer, 'currencyId')
-            currencyId.text = item.currencyId
-            categoryId = ET.SubElement(offer, 'categoryId')
-            categoryId.text = item.categoryId
-            for pic in item.pictures:
-                picture = ET.SubElement(offer, 'picture')
-                picture.text = pic
-            delivery = ET.SubElement(offer, 'delivery')
-            delivery.text = item.delivery
-            dimensions = ET.SubElement(offer, 'dimensions')
-            dimensions.text = item.dimensions
-            weight = ET.SubElement(offer, 'weight')
-            weight.text = item.weight
-            vendor = ET.SubElement(offer, 'vendor')
-            vendor.text = item.vendor
-            vendorCode = ET.SubElement(offer, 'vendorCode')
-            vendorCode.text = item.vendorCode
-            name = ET.SubElement(offer, 'name')
-            name.text = item.name
-            description = ET.SubElement(offer, 'description')
-            if mode == 0:
-                description.text = item.description
-                if item.size is not None:
-                    param = ET.SubElement(offer, 'param')
-                    param.set('name', 'Размер')
-                    param.text = item.size
-            else:
-                description.text = item.simplify_description()
+            if price_code in item.prices:
+                # print(item.size, item.sizes_available)
+                offer = ET.SubElement(offers, 'offer')
+                offer.set('id', item.id)
+                offer.set('available', item.available)
+                url = ET.SubElement(offer, 'url')
+                url.text = item.url
+                item.set_price(price_code) # test
+                price = ET.SubElement(offer, 'price')
+                price.text = item.current_price
+                if mode == 1:
+                    quantity = ET.SubElement(offer, 'quantity')
+                    quantity.text = item.quantity
+                currencyId = ET.SubElement(offer, 'currencyId')
+                currencyId.text = item.currencyId
+                categoryId = ET.SubElement(offer, 'categoryId')
+                categoryId.text = item.categoryId
+                for pic in item.pictures:
+                    picture = ET.SubElement(offer, 'picture')
+                    picture.text = pic
+                delivery = ET.SubElement(offer, 'delivery')
+                delivery.text = item.delivery
+                dimensions = ET.SubElement(offer, 'dimensions')
+                dimensions.text = item.dimensions
+                weight = ET.SubElement(offer, 'weight')
+                weight.text = item.weight
+                vendor = ET.SubElement(offer, 'vendor')
+                vendor.text = item.vendor
+                vendorCode = ET.SubElement(offer, 'vendorCode')
+                vendorCode.text = item.vendorCode
+                name = ET.SubElement(offer, 'name')
+                name.text = item.name
+                description = ET.SubElement(offer, 'description')
+                if mode == 1:
+                    description.text = item.description
+                    if item.size is not None:
+                        param = ET.SubElement(offer, 'param')
+                        param.set('name', 'Размер')
+                        param.text = item.size
+                else:
+                    description.text = item.simplify_description()
 
     mydata = minidom.parseString(ET.tostring(data)).toprettyxml(indent = '    ')
-    if mode == 0:
-        with open ('test.xml', 'w', encoding='utf-8') as test:
-            test.write(mydata)
-    else:
-        with open ('test_simplified.xml', 'w', encoding='utf-8') as test:
-            test.write(mydata)
+    with open (yml_name, 'w', encoding='utf-8') as yml:
+        yml.write(mydata)
 
