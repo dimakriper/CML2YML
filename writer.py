@@ -33,7 +33,7 @@ def create_yml(header, body, scope):
     offers = ET.SubElement(shop, 'offers')
 
     for data_dict in body:
-        if mode == 1:
+        if mode == '1':
             offers_collection = data_dict.values()
         else:
             offers_collection = []
@@ -53,7 +53,7 @@ def create_yml(header, body, scope):
                 item.set_price(price_code) # test
                 price = ET.SubElement(offer, 'price')
                 price.text = item.current_price
-                if mode == 1:
+                if mode == '1':
                     quantity = ET.SubElement(offer, 'quantity')
                     quantity.text = item.quantity
                 currencyId = ET.SubElement(offer, 'currencyId')
@@ -76,7 +76,7 @@ def create_yml(header, body, scope):
                 name = ET.SubElement(offer, 'name')
                 name.text = item.name
                 description = ET.SubElement(offer, 'description')
-                if mode == 1:
+                if mode == '1':
                     description.text = item.description
                     if item.size is not None:
                         param = ET.SubElement(offer, 'param')
