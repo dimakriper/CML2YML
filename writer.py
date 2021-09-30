@@ -4,6 +4,11 @@ from datetime import datetime
 
 from classes import *
 
+"""
+header = CatalogData() obj with categories
+body: list of dicts of offers for every catalogue
+scope: list with settings 
+"""
 
 def create_yml(header, body, scope):
     yml_name = scope[0] + '.xml'
@@ -13,6 +18,7 @@ def create_yml(header, body, scope):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d %H:%M")
 
+    # create header
     data = ET.Element('yml_catalog')
     data.set('date', dt_string)
     shop = ET.SubElement(data, 'shop')
@@ -30,12 +36,16 @@ def create_yml(header, body, scope):
         category = ET.SubElement(categories, 'category')
         category.set('id', cat[0])
         category.text = cat[1]
+    # create body
     offers = ET.SubElement(shop, 'offers')
 
+    # add offer to body
+    # mode = '1' for regular yml, '2' for simplified
     for data_dict in body:
         if mode == '1':
             offers_collection = data_dict.values()
         else:
+            # only offers with unique ids
             offers_collection = []
             id_list = []
             for item in data_dict.values():
@@ -44,7 +54,6 @@ def create_yml(header, body, scope):
                     id_list.append(item.id)
         for item in offers_collection:
             if price_code in item.prices:
-                # print(item.size, item.sizes_available)
                 offer = ET.SubElement(offers, 'offer')
                 offer.set('id', item.id)
                 offer.set('available', item.available)

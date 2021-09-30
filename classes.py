@@ -38,6 +38,7 @@ class OfferData:
         return simple_des
 
 
+# header of yml
 class CatalogData:
     def __init__(self):
         self.name = 'Polyanka PL'

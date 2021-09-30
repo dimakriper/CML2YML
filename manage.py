@@ -2,6 +2,11 @@ import os
 from configparser import ConfigParser
 import re
 
+"""
+This module is for getting paths to input data (CMLs in folder)
+and settings for output files
+"""
+
 config = ConfigParser()
 config.read('settings.ini')
 roots = config['ROOTS']
@@ -9,10 +14,11 @@ webdata_folder = roots['webdata_root']
 csv_file = roots['csv_root']
 
 
+# sort input files from directory into tuples by NUMBER_NUMBER in filename
+# e.g. [("/../path/offers0_1.xml", "/../path/import0_1.xml)..]
 def match_pairs(directory):
     list_of_pairs = []
     folder_string = ' '.join(os.listdir(directory))
-    # pattern = r'([A-Za-z]+)([\d]+_[\d]+).xml'
     import_list = re.findall(r'import[\d]+_[\d]+.xml', folder_string)
     offers_list = re.findall(r'offers[\d]+_[\d]+.xml', folder_string)
     for import_file in import_list:
@@ -23,6 +29,7 @@ def match_pairs(directory):
     return list_of_pairs
 
 
+# extract settings from csv ( ":" - delimeter) to list
 def find_scopes(table):
     scopes = []
     with open(table) as csv:
