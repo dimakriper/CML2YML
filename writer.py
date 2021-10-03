@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from datetime import datetime
+import copy
 
 from classes import *
 
@@ -50,6 +51,11 @@ def create_yml(header, body, scope):
             id_list = []
             for item in data_dict.values():
                 if item.id not in id_list:
+                    item = copy.deepcopy(item)
+                    for i in data_dict.values():
+                        if i.id == item.id and i.quantity_is_positive():
+                            item.available = 'true'
+                            break
                     offers_collection.append(item)
                     id_list.append(item.id)
         for item in offers_collection:

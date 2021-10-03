@@ -59,38 +59,28 @@ def collect_data(list_of_pairs, catalog_data):
                 # M-XL
                 return None
 
-        def quantity_is_positive(product_obj):
-            return True if product_obj.quantity != '0' else False
-
         # set sizes to sizes_available attrib
         # of every OfferData obj in set
         # depending on id, quantity and size
         # of every offer
         def set_sizes_available(product_obj_set):
             dict_of_available = {}  # id : [sizes]
-            list_of_sizes = []
-            current_id = None
+            id_list = []
+            # fill unique ids in dict_of_available as keys and assign to []
             for product_obj in product_obj_set.values():
-                if product_obj.size is not None:
-                    if quantity_is_positive(product_obj):
-                        # for the 1st object in queue set current id: add size to list
-                        if current_id is None and product_obj.id is not None:
-                            current_id = product_obj.id
-                            list_of_sizes.append(product_obj.size)
-                        # continue adding sizes to list
-                        elif product_obj.id == current_id and product_obj.id is not None:
-                            list_of_sizes.append(product_obj.size)
-                        # push list to dict with current id and set next "current_id", add size to new list
-                        elif product_obj.id != current_id and product_obj.id is not None:
-                            dict_of_available[current_id] = list_of_sizes
-                            current_id = product_obj.id
-                            list_of_sizes = [product_obj.size]
-            # set available sizes from dict to objs by suitable ids
+                if product_obj.id not in id_list:
+                    dict_of_available[product_obj.id] = []
+                    id_list.append(product_obj.id)
+            # fill id : [] with sizes
             for product_obj in product_obj_set.values():
-                if product_obj.id in dict_of_available:
-                    product_obj.sizes_available = dict_of_available[product_obj.id]
+                if product_obj.size is not None and product_obj.quantity_is_positive():
+                    dict_of_available[product_obj.id].append(product_obj.size)
+            # assign sizes_available attrib of every product_obj to list from dict_of_available by id
+            for product_obj in product_obj_set.values():
+                product_obj.sizes_available = dict_of_available[product_obj.id]
 
-        # This code works with importX_X input file
+
+                    # This code works with importX_X input file
         # It creates OfferData() objs dynamically with "product_set" dict
         # and sets most of their attribs by parsing importX_X
         # products: <Товары> tag in input file
@@ -132,6 +122,8 @@ def collect_data(list_of_pairs, catalog_data):
                 for currency in currencies:
                     product_set[offerId].prices[currency[1].text] = currency[2].text
                 product_set[offerId].quantity = offer[5].text
+                if product_set[offerId].quantity == '0':
+                    product_set[offerId].available = 'false'
                 size_data = size_finder(offer[2].text)
                 if type(size_data) is list:
                     # create copy of current object but with another size

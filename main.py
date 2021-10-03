@@ -23,7 +23,7 @@ scopes = find_scopes(csv_file)
 for scope in scopes:
     create_yml(catalog_data, dataset, scope)
 
-# test script
+# # test script
 
 # pairs = [['XML/webdata/offers0_1.xml','XML/webdata/import0_1.xml']]
 # dataset = collect_data(pairs, catalog_data)

@@ -31,11 +31,15 @@ class OfferData:
         simple_des = self.description
         if re.search(r'Производство:.*', simple_des) is not None:
             simple_des = re.sub(r'Производство:.*', '', simple_des)
-        if len(self.sizes_available) > 0:
-            simple_des = simple_des + 'Размеры в наличии: ' + ', '.join(self.sizes_available)
+        if self.available == 'true':
+            if len(self.sizes_available) > 0:
+                simple_des = simple_des + 'Размеры в наличии: ' + ', '.join(self.sizes_available) + ' (остальные размеры под заказ)'
         else:
-            simple_des = simple_des + 'В наличии нет, возможен заказ товара.'
+            simple_des = simple_des.rstrip() + ' (возможно заказать любой размер)'
         return simple_des
+
+    def quantity_is_positive(self):
+        return True if int(self.quantity) > 0 else False
 
 
 # header of yml
