@@ -12,7 +12,7 @@ def collect_data(list_of_pairs, catalog_data):
     # for every "import.xml" file
     # if obj.categories doesnt already content it
     def find_categories(groups):
-        assert groups.tag != '{urn:1C.ru:commerceml_2}Группы'
+        assert groups.tag == '{urn:1C.ru:commerceml_2}Группы', groups.tag
         category_data = groups[0][0].text, groups[0][1].text
         if category_data not in catalog_data.categories:
             catalog_data.categories.append(category_data)
@@ -40,9 +40,10 @@ def collect_data(list_of_pairs, catalog_data):
         def check_description(product):
             description = product.find('{urn:1C.ru:commerceml_2}Описание')
             if description is not None:
-                if len(description.text) > 0:
-                    if description.text[-3:] != 'DEL':
-                        return True
+                if description.text is not None:
+                    if len(description.text) > 0:
+                        if description.text[-3:] != 'DEL':
+                            return True
 
         def size_finder(product_name):
             size_data = re.search(r'Р(\w[\w]*)([-\/])?(\w[\w]*)?\)', product_name)
@@ -84,7 +85,7 @@ def collect_data(list_of_pairs, catalog_data):
         # and sets most of their attribs by parsing importX_X
         # products: <Товары> tag in input file
         products = import_root[1][4]
-        assert products.tag != '{urn:1C.ru:commerceml_2}Группы'
+        assert products.tag == '{urn:1C.ru:commerceml_2}Товары'
         product_set = {}  # offerId : OfferData() obj
         for product in products:
             if check_offerpic(product) and check_description(product):
@@ -97,15 +98,15 @@ def collect_data(list_of_pairs, catalog_data):
                 name = re.sub(r' *\( *[\w]* *Р *(\w[\w]*) *([-\/])? *(\w[\w]*)?\)', '', name)
                 product_set[offerId].name = name
                 product_set[offerId].categoryId = import_root[0][3][0][2][0][0].text
-                assert not re.match(r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}', product_set[offerId].categoryId)
+                assert re.match(r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}', product_set[offerId].categoryId)
                 product_set[offerId].vendor_id = product.find('{urn:1C.ru:commerceml_2}Группы')[0].text
-                assert not re.match(r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}', product_set[offerId].vendor_id)
+                assert re.match(r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}', product_set[offerId].vendor_id)
                 product_set[offerId].description = product.find('{urn:1C.ru:commerceml_2}Описание').text
                 pictures = product.findall('{urn:1C.ru:commerceml_2}Картинка')
                 for picture in pictures:
                     product_set[offerId].pictures.append('https://www.polyanka.pl/yml/webdata/' + picture.text)
                 product_id = product.find('{urn:1C.ru:commerceml_2}ЗначенияРеквизитов')[0][1].text
-                assert product.find('{urn:1C.ru:commerceml_2}ЗначенияРеквизитов')[0][0].text != 'Код'
+                assert product.find('{urn:1C.ru:commerceml_2}ЗначенияРеквизитов')[0][0].text == 'Код'
                 product_id = re.search(r'[\d]+', product_id).group()
                 product_set[offerId].id = product_id
                 for category in catalog_data.categories:
@@ -119,7 +120,7 @@ def collect_data(list_of_pairs, catalog_data):
         # 3) set attribs to suitable OfferData() obj
         # offers: <Предложения> tag in input file
         offers = offers_root[1][7]
-        assert offers.tag != '{urn:1C.ru:commerceml_2}Предложения'
+        assert offers.tag == '{urn:1C.ru:commerceml_2}Предложения'
         for offer in offers:
             offerId = offer.find('{urn:1C.ru:commerceml_2}Ид').text
             if offerId in product_set:
