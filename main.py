@@ -2,6 +2,7 @@ from classes import *
 from writer import *
 from reader import *
 from manage import *
+from logger import logger
 
 
 """
@@ -11,17 +12,29 @@ to requested set of YMLs (Yandex Market format XML docs)
 attension: some names may not represent the content
 """
 
-# header with categories
-catalog_data = CatalogData()
-# list of tuples: ('offersX_X.path", 'importX_X.path") to parse
-list_of_pairs = match_pairs(webdata_folder)
-# get list of dicts: {offerid : OfferData()} and pass categories to catalog_data
-dataset = collect_data(list_of_pairs, catalog_data)
-# list of lists: ['output_file_name', '1 or 2'(1=default, 2=simplified mode), 'currency_id']
-scopes = find_scopes(csv_file)
-# finally create some ymls from collected data
-for scope in scopes:
-    create_yml(catalog_data, dataset, scope)
+logger.info('START')
+
+try:
+    # header with categories
+    catalog_data = CatalogData()
+    # list of tuples: ('offersX_X.path", 'importX_X.path") to parse
+    list_of_pairs = match_pairs(webdata_folder)
+    # get list of dicts: {offerid : OfferData()} and pass categories to catalog_data
+    logger.info('Collecting data from pairs ....')
+    dataset = collect_data(list_of_pairs, catalog_data)
+    # list of lists: ['output_file_name', '1 or 2'(1=default, 2=simplified mode), 'currency_id']
+    scopes = find_scopes(csv_file)
+    # finally create some ymls from collected data
+    for scope in scopes:
+        logger.info('Creating YML with name : %s, type : %s, price type : %s settings ....' % (scope[0], scope[1], scope[2]))
+        create_yml(catalog_data, dataset, scope)
+except:
+    logger.exception("Exception occurred")
+    logger.info('END\n\n')
+    raise
+
+logger.info('Program finished successfully.')
+logger.info('END\n\n')
 
 # # test script
 
