@@ -12,6 +12,7 @@ config.read('settings.ini')
 roots = config['ROOTS']
 webdata_folder = roots['webdata_root']
 csv_file = roots['csv_root']
+pictures_dir = roots['pictures_root']
 
 
 # sort input files from directory into tuples by NUMBER_NUMBER in filename
@@ -41,3 +42,9 @@ def find_scopes(table):
             if len(scope) == 3:
                 scopes.append(scope)
     return scopes
+
+def prepare_folder(pictures_dir):
+    os.system(r'prepare_dirs.cmd %s' % pictures_dir)
+
+prepare_folder(pictures_dir)
+

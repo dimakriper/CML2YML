@@ -22,6 +22,8 @@ try:
     # get list of dicts: {offerid : OfferData()} and pass categories to catalog_data
     logger.info('Collecting data from pairs ....')
     dataset = collect_data(list_of_pairs, catalog_data)
+    prepare_folder(pictures_dir)
+    logger.info('yml/webdata/import_files updated')
     # list of lists: ['output_file_name', '1 or 2'(1=default, 2=simplified mode), 'currency_id']
     scopes = find_scopes(csv_file)
     # finally create some ymls from collected data
